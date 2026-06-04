@@ -79,6 +79,12 @@ const commands = [
         .setDescription('Mô tả khuôn mặt, phong thái hoặc tính cách')
         .setRequired(true)
         .setMaxLength(500)
+    )
+    .addAttachmentOption(option =>
+      option
+        .setName('anh')
+        .setDescription('Ảnh khuôn mặt hoặc chân dung, không bắt buộc')
+        .setRequired(false)
     ),
 
   new SlashCommandBuilder()
@@ -426,7 +432,18 @@ async function handlePalmReading(interaction) {
 
 async function handleFaceReading(interaction) {
   const description = interaction.options.getString('mota', true).trim();
-  const seed = `${interaction.user.id}:${description.toLowerCase()}:face`;
+  const image = interaction.options.getAttachment('anh');
+
+  if (image && (!image.contentType || !image.contentType.startsWith('image/'))) {
+    await interaction.reply({
+      content: 'Bạn hãy gửi một file ảnh hợp lệ nếu muốn xem nhân tướng kèm ảnh nha.',
+      ephemeral: true
+    });
+    return;
+  }
+
+  const imageSeed = image ? `:${image.id}` : '';
+  const seed = `${interaction.user.id}:${description.toLowerCase()}${imageSeed}:face`;
   const charm = (hashToNumber(`${seed}:charm`) % 41) + 58;
   const aura = (hashToNumber(`${seed}:aura`) % 41) + 58;
   const code = displayCode('NT', seed);
@@ -446,6 +463,10 @@ async function handleFaceReading(interaction) {
       { name: 'Tính cách nổi bật', value: pick(personalityResults, `${seed}:personality`) },
       { name: 'Lời nhắc', value: 'Hãy dùng điểm mạnh để đối xử tốt với mình trước, rồi may mắn tự tìm đường đến.' }
     );
+
+  if (image) {
+    embed.setImage(image.url);
+  }
 
   await interaction.reply({ embeds: [embed] });
 }
@@ -494,7 +515,7 @@ async function handleHelp(interaction) {
     .addFields(
       { name: '/boingaysinh', value: 'Nhập ngày, tháng, năm sinh để xem tính cách, may mắn, tình duyên, tài lộc.' },
       { name: '/boichitay', value: 'Gửi ảnh bàn tay để nhận kết quả bói vui theo user ID.' },
-      { name: '/boinhan_tuong', value: 'Nhập mô tả khuôn mặt hoặc tính cách để xem nhân tướng học vui.' },
+      { name: '/boinhan_tuong', value: 'Nhập mô tả khuôn mặt hoặc tính cách, có thể gửi thêm ảnh chân dung.' },
       { name: '/thienthuong', value: 'Nhập tên nhân vật game để dự đoán tỉ lệ may mắn, ngày đẹp và giờ đẹp.' },
       { name: 'Phong cách trả lời', value: 'Mỗi quẻ có mã riêng, một quẻ trong 64 quẻ Kinh Dịch, thang vận khí và cấp vận may.' }
     );
