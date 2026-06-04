@@ -1,6 +1,6 @@
 const crypto = require('node:crypto');
+const http = require('node:http');
 const {
-  AttachmentBuilder,
   Client,
   EmbedBuilder,
   GatewayIntentBits,
@@ -9,6 +9,7 @@ const {
 require('dotenv').config();
 
 const TOKEN = process.env.TOKEN;
+const PORT = process.env.PORT || 3000;
 
 if (!TOKEN) {
   console.error('Thieu TOKEN. Hay tao file .env hoac cau hinh bien moi truong TOKEN tren Railway.');
@@ -17,6 +18,17 @@ if (!TOKEN) {
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
+});
+
+// Web server nho de cac nen tang host nhu Koyeb/Render biet bot van dang chay.
+// Discord bot khong can web route, nhung health check giup deploy on dinh hon.
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Bot Boi Toan dang chay.');
+});
+
+server.listen(PORT, () => {
+  console.log(`Health server dang lang nghe tren port ${PORT}`);
 });
 
 const DISCLAIMER = 'Noi dung chi mang tinh giai tri, khong khang dinh dung that va khong thay the loi khuyen thuc te.';

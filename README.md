@@ -81,6 +81,39 @@ Neu Railway khong tu nhan lenh start, hay dat Start Command la:
 npm start
 ```
 
+## Deploy len Koyeb neu Railway khong dung duoc
+
+Koyeb co the chay project tu GitHub va can mot cong HTTP de health check. Project nay da co health server tu dong dung bien `PORT`, nen co the deploy nhu web service.
+
+1. Vao Koyeb va tao app/service moi tu GitHub.
+2. Chon repo `Bot-Boi-Toan`.
+3. Chon branch `main`.
+4. Build command:
+
+```bash
+npm install
+```
+
+5. Run command:
+
+```bash
+npm start
+```
+
+6. Them bien moi truong:
+
+```env
+TOKEN=your_discord_bot_token_here
+```
+
+7. Deploy va doi log hien:
+
+```text
+Bot Boi Toan da dang nhap voi ten ...
+```
+
+Neu slash command chua hien ngay trong Discord, hay doi vai phut vi command global can thoi gian dong bo.
+
 ## Ghi chu ky thuat
 
 - Bot dung `discord.js` v14.
@@ -89,3 +122,4 @@ npm start
 - Slash commands duoc deploy global khi bot ready bang `client.application.commands.set(...)`.
 - `/thienthuong` random on dinh theo ten nhan vat va ngay hien tai tai mui gio Viet Nam.
 - `/boichitay` khong phan tich anh that, chi dung anh lam dau vao va tra ket qua vui theo user ID.
+- Co health server dung `process.env.PORT` de deploy duoc tren cac nen tang can HTTP health check.
