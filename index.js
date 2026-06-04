@@ -176,6 +176,18 @@ function displayCode(prefix, seed, detail = '') {
   return [prefix, detail, readingCode(seed)].filter(Boolean).join('-');
 }
 
+function getHexagram(seed) {
+  return hexagrams[hashToNumber(`${seed}:hexagram`) % hexagrams.length];
+}
+
+function formatHexagram(hexagram) {
+  return [
+    `**${String(hexagram.number).padStart(2, '0')}. ${hexagram.name}**`,
+    hexagram.meaning,
+    `Chủ ý: **${hexagram.theme}**`
+  ].join('\n');
+}
+
 function statLine(label, percent) {
   return `${label.padEnd(12, ' ')} ${String(percent).padStart(3, ' ')}% ${makeBar(percent)}`;
 }
@@ -208,6 +220,74 @@ const luckyItems = [
   'một chiếc áo hợp vía',
   'một khoảng nghỉ ngắn',
   'một lời chúc từ bạn bè'
+];
+
+// Dữ liệu 64 quẻ tham khảo từ bảng quẻ Kinh Dịch Kabala, viết lại ngắn gọn cho bot bói vui.
+const hexagrams = [
+  { number: 1, name: 'Càn Vi Thiên', meaning: 'Khí trời mạnh, hợp mở đường và chủ động.', theme: 'khởi thế' },
+  { number: 2, name: 'Khôn Vi Địa', meaning: 'Đất dày nâng đỡ, hợp kiên nhẫn và tích lũy.', theme: 'bền bỉ' },
+  { number: 3, name: 'Thủy Lôi Truân', meaning: 'Mầm mới còn vướng, khởi đầu khó nhưng có lực bật.', theme: 'vượt mở đầu' },
+  { number: 4, name: 'Sơn Thủy Mông', meaning: 'Còn mờ đường, nên học thêm và hỏi đúng người.', theme: 'khai sáng' },
+  { number: 5, name: 'Thủy Thiên Nhu', meaning: 'Thời vận cần chờ, vội quá dễ hụt nhịp.', theme: 'đợi thời' },
+  { number: 6, name: 'Thiên Thủy Tụng', meaning: 'Dễ sinh tranh cãi, nên mềm lời và tránh hơn thua.', theme: 'hóa giải' },
+  { number: 7, name: 'Địa Thủy Sư', meaning: 'Cần kỷ luật, đi theo đội hình thì dễ thắng hơn.', theme: 'tổ chức' },
+  { number: 8, name: 'Thủy Địa Tỷ', meaning: 'May đến qua kết nối, hợp đi cùng người đáng tin.', theme: 'liên kết' },
+  { number: 9, name: 'Phong Thiên Tiểu Súc', meaning: 'Tích nhỏ thành lớn, chưa nên bung hết lực.', theme: 'gom vận' },
+  { number: 10, name: 'Thiên Trạch Lý', meaning: 'Bước đi cần chuẩn, lễ độ sẽ mở đường.', theme: 'cẩn trọng' },
+  { number: 11, name: 'Địa Thiên Thái', meaning: 'Khí hanh thông, việc khó có dấu hiệu nhẹ dần.', theme: 'thuận lợi' },
+  { number: 12, name: 'Thiên Địa Bĩ', meaning: 'Dòng vận đang nghẽn, nên giữ sức và tránh cố chấp.', theme: 'qua tắc' },
+  { number: 13, name: 'Thiên Hỏa Đồng Nhân', meaning: 'Đồng lòng thì sáng, hợp rủ người cùng chí hướng.', theme: 'hợp lực' },
+  { number: 14, name: 'Hỏa Thiên Đại Hữu', meaning: 'Vận sở hữu lớn, dễ có món lợi hoặc cơ hội sáng.', theme: 'được mùa' },
+  { number: 15, name: 'Địa Sơn Khiêm', meaning: 'Khiêm tốn thì thắng, càng nhẹ nhàng càng được nâng.', theme: 'hạ mình' },
+  { number: 16, name: 'Lôi Địa Dự', meaning: 'Khí vui bật lên, hợp khởi động việc đã ấp ủ.', theme: 'hứng khởi' },
+  { number: 17, name: 'Trạch Lôi Tùy', meaning: 'Theo đúng dòng sẽ thuận, cưỡng lại dễ mệt.', theme: 'linh hoạt' },
+  { number: 18, name: 'Sơn Phong Cổ', meaning: 'Việc cũ cần sửa, dọn nền trước rồi hãy tiến.', theme: 'chỉnh sửa' },
+  { number: 19, name: 'Địa Trạch Lâm', meaning: 'Vận đang tiến gần, nên chuẩn bị để đón cơ hội.', theme: 'áp sát' },
+  { number: 20, name: 'Phong Địa Quán', meaning: 'Quan sát trước khi quyết, nhìn rộng sẽ thấy lối.', theme: 'nhìn xa' },
+  { number: 21, name: 'Hỏa Lôi Phệ Hạp', meaning: 'Cần cắn gọn nút thắt, xử lý thẳng vấn đề.', theme: 'dứt điểm' },
+  { number: 22, name: 'Sơn Hỏa Bí', meaning: 'Vẻ ngoài sáng lên, hợp chăm chút hình ảnh và lời nói.', theme: 'tô điểm' },
+  { number: 23, name: 'Sơn Địa Bác', meaning: 'Có dấu hiệu hao mòn, nên giảm rủi ro và giữ nền.', theme: 'giữ lại' },
+  { number: 24, name: 'Địa Lôi Phục', meaning: 'Vận quay trở lại, cơ hội cũ có thể mở lần nữa.', theme: 'trở về' },
+  { number: 25, name: 'Thiên Lôi Vô Vọng', meaning: 'Đừng ép điều không thuộc về mình, tự nhiên sẽ nhẹ hơn.', theme: 'thuận tự nhiên' },
+  { number: 26, name: 'Sơn Thiên Đại Súc', meaning: 'Tích lực lớn, hợp để dành tài nguyên cho cú quan trọng.', theme: 'nén lực' },
+  { number: 27, name: 'Sơn Lôi Di', meaning: 'Nuôi dưỡng bản thân, ăn ngủ và tinh thần cần được chăm.', theme: 'bồi bổ' },
+  { number: 28, name: 'Trạch Phong Đại Quá', meaning: 'Gánh hơi nặng, nên bớt ôm đồm để không quá tải.', theme: 'giảm áp' },
+  { number: 29, name: 'Khảm Vi Thủy', meaning: 'Nước sâu thử lòng, bình tĩnh thì qua được hiểm.', theme: 'vượt hiểm' },
+  { number: 30, name: 'Ly Vi Hỏa', meaning: 'Ánh sáng rõ, hợp minh bạch và chọn điều mình tin.', theme: 'soi sáng' },
+  { number: 31, name: 'Trạch Sơn Hàm', meaning: 'Dễ có rung động, cảm xúc chạm đúng điểm sẽ mở vận.', theme: 'giao cảm' },
+  { number: 32, name: 'Lôi Phong Hằng', meaning: 'Bền bỉ là chìa khóa, làm đều hơn làm quá mạnh.', theme: 'lâu dài' },
+  { number: 33, name: 'Thiên Sơn Độn', meaning: 'Lùi một bước để giữ thế, né đúng lúc là khôn.', theme: 'ẩn mình' },
+  { number: 34, name: 'Lôi Thiên Đại Tráng', meaning: 'Lực mạnh đang lên, nhưng cần dùng lực cho đúng chỗ.', theme: 'bứt phá' },
+  { number: 35, name: 'Hỏa Địa Tấn', meaning: 'Đường tiến sáng, hợp chủ động bước thêm một nhịp.', theme: 'tiến lên' },
+  { number: 36, name: 'Địa Hỏa Minh Di', meaning: 'Ánh sáng bị che, nên kín tiếng và giữ điều quan trọng.', theme: 'giấu sáng' },
+  { number: 37, name: 'Phong Hỏa Gia Nhân', meaning: 'Nhà và người thân là điểm tựa, hợp sửa nếp sinh hoạt.', theme: 'an gia' },
+  { number: 38, name: 'Hỏa Trạch Khuê', meaning: 'Khác ý dễ xảy ra, nên tìm điểm chung trước.', theme: 'hòa khác biệt' },
+  { number: 39, name: 'Thủy Sơn Kiển', meaning: 'Đường có trở ngại, đi vòng có khi lại nhanh.', theme: 'vượt khó' },
+  { number: 40, name: 'Lôi Thủy Giải', meaning: 'Nút thắt được cởi, hợp buông bớt áp lực cũ.', theme: 'giải tỏa' },
+  { number: 41, name: 'Sơn Trạch Tổn', meaning: 'Bớt đi để được lại, hy sinh nhỏ mở lợi lớn.', theme: 'tinh giản' },
+  { number: 42, name: 'Phong Lôi Ích', meaning: 'Có dấu hiệu thêm lên, hợp nhận giúp đỡ và trao đi.', theme: 'tăng ích' },
+  { number: 43, name: 'Trạch Thiên Quải', meaning: 'Điều bị nén dễ bung, cần quyết nhưng đừng nóng.', theme: 'quyết đoán' },
+  { number: 44, name: 'Thiên Phong Cấu', meaning: 'Gặp duyên bất ngờ, vui nhưng cần tỉnh táo.', theme: 'gặp gỡ' },
+  { number: 45, name: 'Trạch Địa Tụy', meaning: 'Năng lượng tụ lại, hợp team-up và gom nguồn lực.', theme: 'hội tụ' },
+  { number: 46, name: 'Địa Phong Thăng', meaning: 'Từng bước đi lên, nhỏ mà chắc sẽ lên tầng.', theme: 'thăng tiến' },
+  { number: 47, name: 'Trạch Thủy Khốn', meaning: 'Khó chịu tạm thời, giữ nhịp là qua đoạn hẹp.', theme: 'chịu lực' },
+  { number: 48, name: 'Thủy Phong Tỉnh', meaning: 'Nguồn cũ vẫn có giá trị, quay về gốc để lấy lực.', theme: 'khơi nguồn' },
+  { number: 49, name: 'Trạch Hỏa Cách', meaning: 'Đến lúc đổi cách, cải tổ nhỏ tạo vận mới.', theme: 'thay đổi' },
+  { number: 50, name: 'Hỏa Phong Đỉnh', meaning: 'Vận nâng cấp, hợp làm thứ gì có dáng dấp lớn hơn.', theme: 'nâng tầm' },
+  { number: 51, name: 'Chấn Vi Lôi', meaning: 'Tiếng sấm đánh thức, bất ngờ nhưng giúp tỉnh ra.', theme: 'thức tỉnh' },
+  { number: 52, name: 'Cấn Vi Sơn', meaning: 'Nên dừng đúng lúc, đứng vững trước khi đi tiếp.', theme: 'tĩnh lại' },
+  { number: 53, name: 'Phong Sơn Tiệm', meaning: 'Chậm mà chắc, vận đẹp đến theo nhịp từ từ.', theme: 'tiệm tiến' },
+  { number: 54, name: 'Lôi Trạch Quy Muội', meaning: 'Duyên phụ thuộc hoàn cảnh, đừng để cảm xúc kéo quá xa.', theme: 'giữ chừng' },
+  { number: 55, name: 'Lôi Hỏa Phong', meaning: 'Vận đang đầy, tranh thủ lúc sáng nhưng đừng phung phí.', theme: 'phong thịnh' },
+  { number: 56, name: 'Hỏa Sơn Lữ', meaning: 'Thân như lữ khách, linh hoạt sẽ có đường.', theme: 'dịch chuyển' },
+  { number: 57, name: 'Tốn Vi Phong', meaning: 'Gió len nhẹ mà sâu, lời mềm có sức mạnh.', theme: 'thẩm thấu' },
+  { number: 58, name: 'Đoài Vi Trạch', meaning: 'Niềm vui mở vận, nói chuyện dễ đem lại cơ hội.', theme: 'vui vẻ' },
+  { number: 59, name: 'Phong Thủy Hoán', meaning: 'Điều cũ tan ra, hợp giải tán căng thẳng và làm mới.', theme: 'tan mở' },
+  { number: 60, name: 'Thủy Trạch Tiết', meaning: 'Có giới hạn là tốt, tiết chế giúp giữ vận.', theme: 'chừng mực' },
+  { number: 61, name: 'Phong Trạch Trung Phù', meaning: 'Lòng tin là cốt lõi, chân thành dễ thắng.', theme: 'tín tâm' },
+  { number: 62, name: 'Lôi Sơn Tiểu Quá', meaning: 'Lỗi nhỏ dễ sửa, đừng phóng đại chuyện chưa lớn.', theme: 'sửa nhẹ' },
+  { number: 63, name: 'Thủy Hỏa Ký Tế', meaning: 'Việc đã thành, giữ thành quả quan trọng hơn mở thêm.', theme: 'hoàn tất' },
+  { number: 64, name: 'Hỏa Thủy Vị Tế', meaning: 'Chưa xong nhưng gần tới, cần thêm một bước chuẩn.', theme: 'chờ hoàn thiện' }
 ];
 
 function getVietnamDateKey(date = new Date()) {
@@ -289,6 +369,7 @@ async function handleBirthReading(interaction) {
   const code = displayCode('NS', seed, birthDetail);
   const color = pick(luckyColors, `${seed}:color`);
   const item = pick(luckyItems, `${seed}:item`);
+  const hexagram = getHexagram(seed);
 
   const embed = finishEmbed(createEmbed('Bói Ngày Sinh', 0xf7b731), interaction, code)
     .setDescription([
@@ -296,6 +377,7 @@ async function handleBirthReading(interaction) {
       `Mã quẻ: \`${code}\``
     ].join('\n'))
     .addFields(
+      { name: 'Quẻ Kinh Dịch', value: formatHexagram(hexagram) },
       { name: 'Tổng quan', value: pick(personalityResults, `${seed}:personality`) },
       { name: 'Bảng vận trình', value: `\`\`\`\n${statLine('May mắn', luckyPercent)}\n${statLine('Tình duyên', lovePercent)}\n${statLine('Tài lộc', fortunePercent)}\n\`\`\`` },
       { name: 'Ấn tín hôm nay', value: `Cấp vận: **${fortuneTier(luckyPercent)}**\nCon số hợp vía: **${luckyNumber}**\nMàu hợp vía: **${color}**\nVật phẩm mở vận: **${item}**` },
@@ -323,6 +405,7 @@ async function handlePalmReading(interaction) {
   const code = displayCode('CT', seed);
   const color = pick(luckyColors, `${seed}:color`);
   const item = pick(luckyItems, `${seed}:item`);
+  const hexagram = getHexagram(seed);
 
   const embed = finishEmbed(createEmbed('Bói Chỉ Tay', 0x45aaf2), interaction, code)
     .setDescription([
@@ -330,6 +413,7 @@ async function handlePalmReading(interaction) {
       `Mã quẻ: \`${code}\``
     ].join('\n'))
     .addFields(
+      { name: 'Quẻ Kinh Dịch', value: formatHexagram(hexagram) },
       { name: 'Vân tay hôm nay', value: pick(palmResults, seed) },
       { name: 'Bảng khí tay', value: `\`\`\`\n${statLine('Vận khí', luckyPercent)}\n${statLine('Tập trung', focusPercent)}\n\`\`\`` },
       { name: 'Ấn tín hôm nay', value: `Cấp vận: **${fortuneTier(luckyPercent)}**\nMàu hợp vía: **${color}**\nVật phẩm mở vận: **${item}**` },
@@ -347,6 +431,7 @@ async function handleFaceReading(interaction) {
   const aura = (hashToNumber(`${seed}:aura`) % 41) + 58;
   const code = displayCode('NT', seed);
   const color = pick(luckyColors, `${seed}:color`);
+  const hexagram = getHexagram(seed);
 
   const embed = finishEmbed(createEmbed('Bói Nhân Tướng', 0xa55eea), interaction, code)
     .setDescription([
@@ -354,6 +439,7 @@ async function handleFaceReading(interaction) {
       `Mã quẻ: \`${code}\``
     ].join('\n'))
     .addFields(
+      { name: 'Quẻ Kinh Dịch', value: formatHexagram(hexagram) },
       { name: 'Nhận định vui', value: pick(faceResults, seed) },
       { name: 'Bảng khí sắc', value: `\`\`\`\n${statLine('Vận may', charm)}\n${statLine('Khí chất', aura)}\n\`\`\`` },
       { name: 'Ấn tín hôm nay', value: `Cấp vận: **${fortuneTier(charm)}**\nMàu hợp vía: **${color}**` },
@@ -381,6 +467,7 @@ async function handleThienThuong(interaction) {
   const color = pick(luckyColors, `${seed}:color`);
   const item = pick(luckyItems, `${seed}:item`);
   const suggestedRolls = (hashToNumber(`${seed}:rolls`) % 5) + 1;
+  const hexagram = getHexagram(seed);
 
   const embed = finishEmbed(createEmbed('Dự Đoán Thiên Thưởng', 0x20bf6b), interaction, code)
     .setDescription([
@@ -388,6 +475,7 @@ async function handleThienThuong(interaction) {
       `Mã quẻ: \`${code}\``
     ].join('\n'))
     .addFields(
+      { name: 'Quẻ Kinh Dịch', value: formatHexagram(hexagram) },
       { name: 'Bảng Thiên Vận', value: `\`\`\`\n${statLine('May mắn', luckyPercent)}\n${statLine('Nhân phẩm', pityPercent)}\n${statLine('Dũng khí', boldPercent)}\n\`\`\`` },
       { name: 'Giờ đẹp', value: `**${String(bestHour).padStart(2, '0')}:${String(bestMinute).padStart(2, '0')}** giờ Việt Nam`, inline: true },
       { name: 'Giờ nên né', value: `**${String(avoidHour).padStart(2, '0')}:00** giờ Việt Nam`, inline: true },
@@ -408,7 +496,7 @@ async function handleHelp(interaction) {
       { name: '/boichitay', value: 'Gửi ảnh bàn tay để nhận kết quả bói vui theo user ID.' },
       { name: '/boinhan_tuong', value: 'Nhập mô tả khuôn mặt hoặc tính cách để xem nhân tướng học vui.' },
       { name: '/thienthuong', value: 'Nhập tên nhân vật game để dự đoán tỉ lệ may mắn, ngày đẹp và giờ đẹp.' },
-      { name: 'Phong cách trả lời', value: 'Mỗi quẻ có mã riêng, thang vận khí và cấp vận may để nhìn rõ hơn trong Discord.' }
+      { name: 'Phong cách trả lời', value: 'Mỗi quẻ có mã riêng, một quẻ trong 64 quẻ Kinh Dịch, thang vận khí và cấp vận may.' }
     );
 
   await interaction.reply({ embeds: [embed], ephemeral: true });
