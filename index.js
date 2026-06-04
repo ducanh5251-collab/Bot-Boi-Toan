@@ -301,7 +301,7 @@ async function handleHelp(interaction) {
   await interaction.reply({ embeds: [embed], ephemeral: true });
 }
 
-client.once('ready', async () => {
+client.once('clientReady', async () => {
   console.log(`Bot Bói Toán đã đăng nhập với tên ${client.user.tag}`);
 
   try {
