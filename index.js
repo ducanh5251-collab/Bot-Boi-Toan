@@ -172,6 +172,10 @@ function readingCode(seed) {
     .toUpperCase();
 }
 
+function displayCode(prefix, seed, detail = '') {
+  return [prefix, detail, readingCode(seed)].filter(Boolean).join('-');
+}
+
 function statLine(label, percent) {
   return `${label.padEnd(12, ' ')} ${String(percent).padStart(3, ' ')}% ${makeBar(percent)}`;
 }
@@ -259,7 +263,7 @@ function createEmbed(title, color = 0xf7b731) {
 
 function finishEmbed(embed, interaction, code) {
   return embed.setFooter({
-    text: `Gieo cho ${interaction.user.username} • Mã ${code} • ${compactDateTime()}`
+    text: `Gieo cho ${interaction.user.username} • ${compactDateTime()}`
   });
 }
 
@@ -281,7 +285,8 @@ async function handleBirthReading(interaction) {
   const luckyPercent = (hashToNumber(`${seed}:percent`) % 41) + 55;
   const lovePercent = (hashToNumber(`${seed}:love-percent`) % 36) + 60;
   const fortunePercent = (hashToNumber(`${seed}:fortune-percent`) % 36) + 60;
-  const code = readingCode(seed);
+  const birthDetail = `${String(day).padStart(2, '0')}${String(month).padStart(2, '0')}${year}`;
+  const code = displayCode('NS', seed, birthDetail);
   const color = pick(luckyColors, `${seed}:color`);
   const item = pick(luckyItems, `${seed}:item`);
 
@@ -315,7 +320,7 @@ async function handlePalmReading(interaction) {
   const seed = `${interaction.user.id}:palm`;
   const luckyPercent = (hashToNumber(`${seed}:percent`) % 46) + 50;
   const focusPercent = (hashToNumber(`${seed}:focus`) % 41) + 55;
-  const code = readingCode(seed);
+  const code = displayCode('CT', seed);
   const color = pick(luckyColors, `${seed}:color`);
   const item = pick(luckyItems, `${seed}:item`);
 
@@ -340,7 +345,7 @@ async function handleFaceReading(interaction) {
   const seed = `${interaction.user.id}:${description.toLowerCase()}:face`;
   const charm = (hashToNumber(`${seed}:charm`) % 41) + 58;
   const aura = (hashToNumber(`${seed}:aura`) % 41) + 58;
-  const code = readingCode(seed);
+  const code = displayCode('NT', seed);
   const color = pick(luckyColors, `${seed}:color`);
 
   const embed = finishEmbed(createEmbed('Bói Nhân Tướng', 0xa55eea), interaction, code)
@@ -372,7 +377,7 @@ async function handleThienThuong(interaction) {
   const bestMinute = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55][hashToNumber(`${seed}:minute`) % 12];
   const avoidHour = (bestHour + 11) % 24;
   const bestDate = addDays(new Date(), bestDayOffset);
-  const code = readingCode(seed);
+  const code = displayCode('TT', seed, todayKey.replaceAll('-', ''));
   const color = pick(luckyColors, `${seed}:color`);
   const item = pick(luckyItems, `${seed}:item`);
   const suggestedRolls = (hashToNumber(`${seed}:rolls`) % 5) + 1;
@@ -395,7 +400,7 @@ async function handleThienThuong(interaction) {
 }
 
 async function handleHelp(interaction) {
-  const code = readingCode(`${interaction.user.id}:help`);
+  const code = displayCode('HELP', `${interaction.user.id}:help`);
   const embed = finishEmbed(createEmbed('Bot Bói Toán - Hướng Dẫn', 0xffc048), interaction, code)
     .setDescription('Bảng lệnh nhanh của Thầy Bà Studio.')
     .addFields(
