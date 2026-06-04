@@ -149,6 +149,29 @@ function pick(list, seed) {
   return list[hashToNumber(seed) % list.length];
 }
 
+function makeBar(percent) {
+  const total = 10;
+  const filled = Math.round((percent / 100) * total);
+  return '█'.repeat(filled) + '░'.repeat(total - filled);
+}
+
+function fortuneTier(percent) {
+  if (percent >= 90) return 'Đại Cát';
+  if (percent >= 75) return 'Cát';
+  if (percent >= 60) return 'Tiểu Cát';
+  if (percent >= 45) return 'Bình Ổn';
+  return 'Dưỡng Vận';
+}
+
+function readingCode(seed) {
+  return crypto
+    .createHash('sha1')
+    .update(String(seed))
+    .digest('hex')
+    .slice(0, 6)
+    .toUpperCase();
+}
+
 function getVietnamDateKey(date = new Date()) {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Ho_Chi_Minh',
@@ -190,6 +213,10 @@ function createEmbed(title, color = 0xf7b731) {
   return new EmbedBuilder()
     .setTitle(title)
     .setColor(color)
+    .setAuthor({
+      name: 'Thầy Bà Studio',
+      iconURL: client.user?.displayAvatarURL()
+    })
     .setTimestamp();
 }
 
@@ -209,14 +236,19 @@ async function handleBirthReading(interaction) {
   const seed = `${day}-${month}-${year}`;
   const luckyNumber = (hashToNumber(`${seed}:number`) % 99) + 1;
   const luckyPercent = (hashToNumber(`${seed}:percent`) % 41) + 55;
+  const lovePercent = (hashToNumber(`${seed}:love-percent`) % 36) + 60;
+  const fortunePercent = (hashToNumber(`${seed}:fortune-percent`) % 36) + 60;
 
   const embed = createEmbed('Bói Ngày Sinh', 0xf7b731)
-    .setDescription(`Lá số vui cho ngày **${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}**`)
+    .setDescription([
+      `Hồ sơ vận mệnh vui cho ngày sinh **${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}**`,
+      `Mã quẻ: \`${readingCode(seed)}\``
+    ].join('\n'))
     .addFields(
-      { name: 'Tính cách', value: pick(personalityResults, `${seed}:personality`) },
-      { name: 'May mắn', value: `Năng lượng hôm nay đạt **${luckyPercent}%**. Con số hợp vía: **${luckyNumber}**.` },
-      { name: 'Tình duyên', value: pick(loveResults, `${seed}:love`) },
-      { name: 'Tài lộc', value: pick(fortuneResults, `${seed}:fortune`) }
+      { name: 'Tổng quan', value: pick(personalityResults, `${seed}:personality`) },
+      { name: 'Vận may', value: `**${luckyPercent}%** • ${fortuneTier(luckyPercent)}\n\`${makeBar(luckyPercent)}\`\nCon số hợp vía: **${luckyNumber}**` },
+      { name: 'Tình duyên', value: `${pick(loveResults, `${seed}:love`)}\n\`${makeBar(lovePercent)}\` **${lovePercent}%**` },
+      { name: 'Tài lộc', value: `${pick(fortuneResults, `${seed}:fortune`)}\n\`${makeBar(fortunePercent)}\` **${fortunePercent}%**` }
     );
 
   await interaction.reply({ embeds: [embed] });
@@ -235,12 +267,17 @@ async function handlePalmReading(interaction) {
 
   const seed = `${interaction.user.id}:palm`;
   const luckyPercent = (hashToNumber(`${seed}:percent`) % 46) + 50;
+  const focusPercent = (hashToNumber(`${seed}:focus`) % 41) + 55;
 
   const embed = createEmbed('Bói Chỉ Tay', 0x45aaf2)
-    .setDescription('Một quẻ vui vừa được gieo từ lòng bàn tay của bạn.')
+    .setDescription([
+      'Một quẻ chỉ tay vui vừa được mở.',
+      `Mã quẻ: \`${readingCode(seed)}\``
+    ].join('\n'))
     .addFields(
       { name: 'Vân tay hôm nay', value: pick(palmResults, seed) },
-      { name: 'Độ may mắn gần đây', value: `**${luckyPercent}%**` },
+      { name: 'Vận khí gần đây', value: `**${luckyPercent}%** • ${fortuneTier(luckyPercent)}\n\`${makeBar(luckyPercent)}\`` },
+      { name: 'Độ tập trung', value: `**${focusPercent}%**\n\`${makeBar(focusPercent)}\``, inline: true },
       { name: 'Gợi ý nhỏ', value: 'Hôm nay hợp với việc làm điều nho nhỏ nhưng có ích, đừng kỳ vọng quá căng.' }
     )
     .setImage(image.url);
@@ -252,12 +289,17 @@ async function handleFaceReading(interaction) {
   const description = interaction.options.getString('mota', true).trim();
   const seed = `${interaction.user.id}:${description.toLowerCase()}:face`;
   const charm = (hashToNumber(`${seed}:charm`) % 41) + 58;
+  const aura = (hashToNumber(`${seed}:aura`) % 41) + 58;
 
   const embed = createEmbed('Bói Nhân Tướng', 0xa55eea)
-    .setDescription(`Mô tả: ${description}`)
+    .setDescription([
+      `Mô tả: ${description}`,
+      `Mã quẻ: \`${readingCode(seed)}\``
+    ].join('\n'))
     .addFields(
       { name: 'Nhận định vui', value: pick(faceResults, seed) },
-      { name: 'Độ hút vận may', value: `**${charm}%**` },
+      { name: 'Độ hút vận may', value: `**${charm}%** • ${fortuneTier(charm)}\n\`${makeBar(charm)}\`` },
+      { name: 'Khí chất', value: `**${aura}%**\n\`${makeBar(aura)}\``, inline: true },
       { name: 'Tính cách nổi bật', value: pick(personalityResults, `${seed}:personality`) },
       { name: 'Lời nhắc', value: 'Hãy dùng điểm mạnh để đối xử tốt với mình trước, rồi may mắn tự tìm đường đến.' }
     );
@@ -271,15 +313,20 @@ async function handleThienThuong(interaction) {
   const seed = `${characterName.toLowerCase()}:${todayKey}:thienthuong`;
 
   const luckyPercent = (hashToNumber(`${seed}:percent`) % 81) + 20;
+  const pityPercent = (hashToNumber(`${seed}:pity`) % 51) + 35;
   const bestDayOffset = (hashToNumber(`${seed}:day`) % 7) + 1;
   const bestHour = (hashToNumber(`${seed}:hour`) % 24);
   const bestMinute = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55][hashToNumber(`${seed}:minute`) % 12];
   const bestDate = addDays(new Date(), bestDayOffset);
 
   const embed = createEmbed('Dự Đoán Thiên Thưởng', 0x20bf6b)
-    .setDescription(`Nhân vật **${characterName}** vừa được gieo vận hôm nay.`)
+    .setDescription([
+      `Nhân vật **${characterName}** vừa được gieo vận hôm nay.`,
+      `Mã quẻ: \`${readingCode(seed)}\``
+    ].join('\n'))
     .addFields(
-      { name: 'Tỉ lệ may mắn hôm nay', value: `**${luckyPercent}%**`, inline: true },
+      { name: 'Tỉ lệ may mắn hôm nay', value: `**${luckyPercent}%** • ${fortuneTier(luckyPercent)}\n\`${makeBar(luckyPercent)}\`` },
+      { name: 'Độ sáng nhân phẩm', value: `**${pityPercent}%**\n\`${makeBar(pityPercent)}\``, inline: true },
       { name: 'Giờ đẹp', value: `**${String(bestHour).padStart(2, '0')}:${String(bestMinute).padStart(2, '0')}** giờ Việt Nam`, inline: true },
       { name: 'Ngày đẹp trong 7 ngày tới', value: formatVietnamDate(bestDate) },
       { name: 'Lời khuyên vui', value: pick(adviceResults, seed) }
@@ -290,12 +337,13 @@ async function handleThienThuong(interaction) {
 
 async function handleHelp(interaction) {
   const embed = createEmbed('Bot Bói Toán - Hướng Dẫn', 0xffc048)
+    .setDescription('Bảng lệnh nhanh của Thầy Bà Studio.')
     .addFields(
       { name: '/boingaysinh', value: 'Nhập ngày, tháng, năm sinh để xem tính cách, may mắn, tình duyên, tài lộc.' },
       { name: '/boichitay', value: 'Gửi ảnh bàn tay để nhận kết quả bói vui theo user ID.' },
       { name: '/boinhan_tuong', value: 'Nhập mô tả khuôn mặt hoặc tính cách để xem nhân tướng học vui.' },
       { name: '/thienthuong', value: 'Nhập tên nhân vật game để dự đoán tỉ lệ may mắn, ngày đẹp và giờ đẹp.' },
-      { name: '/help', value: 'Xem lại hướng dẫn sử dụng bot.' }
+      { name: 'Phong cách trả lời', value: 'Mỗi quẻ có mã riêng, thang vận khí và cấp vận may để nhìn rõ hơn trong Discord.' }
     );
 
   await interaction.reply({ embeds: [embed], ephemeral: true });
