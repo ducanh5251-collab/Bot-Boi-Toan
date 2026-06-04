@@ -1,0 +1,25 @@
+{
+  "name": "bot-boi-toan",
+  "version": "1.0.0",
+  "description": "Discord bot boi toan vui bang slash commands, dung discord.js v14.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "discord",
+    "discord.js",
+    "slash-commands",
+    "railway",
+    "bot-boi-toan"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "discord.js": "^14.19.3",
+    "dotenv": "^16.4.7"
+  }
+}
